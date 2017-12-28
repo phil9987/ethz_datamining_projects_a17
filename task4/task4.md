@@ -1,0 +1,5 @@
+We use the LinUCB algorithm to learn the policy that recommends news articles to users. We scale the rewards to compensate for the probability of the occurrence, i.e. negative rewards are ignored, zero rewards are mapped to -1.03 and positive rewards are mapped to 18.5. These values were determined using grid search. 
+The parameter alpha of LinUCB was set to 3.8, this value too was determined using gridsearch over the parameter space. 
+To avoid a timeout on the server we stop calculating the updates after 1600 seconds (around 27 minutes) because the server has a timeout time of 30 minutes. 
+To improve the performance of the algorithm we store computationally expensive results during the update s.t. we don't need to recompute them during recommendation. During recommendation for every article the ucb is calculated and then the article with the maximum value is chosen. Here too, we use a memoization to avoid repeatedly calculating the same results. 
+It turned out to be very difficult to come up with parameters that reach the easy and hard baseline, we used extensive grid search to succeed.

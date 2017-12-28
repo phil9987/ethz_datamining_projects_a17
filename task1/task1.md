@@ -1,0 +1,7 @@
+A mapper parses the string, extracts the doc_id and a list of shingles.
+Then the signature matrix is calculated using 1000 random permutations and the min-hash technique.
+Finally, we use locality sensitive hashing to get candidates of similar documents. For this the signature matrix is split into 50 bands of 20 rows each and every row is hashed with a hash function of the form ((a * s_i + b) mod p) mod num_buckets where a and b are chosen uniformly at random from the sets [1..num_buckets] and [0..num_buckets] respectively. The number of buckets was determined using grid search and the optimal value on the training data was 1’000’000.  We chose the number of buckets using grid-search, looking for the one which minimizes the number of false positives (FP) while keeping all true positives (TP). With the mentioned number we arrived at 50TP and 59FP.
+For every bucket the document is mapped to, the mapper returns a tuple with the bucket id and the list of shingles with the document id appended: (bucket_id, single_list : doc_id).
+The reducer receives the grouped output of the mappers, meaning a bucket_id and a list of single_list with doc_id appended:
+(bucket_id, [doc1_shingles:doc1_id, doc2_shingles:doc2_id,, …])
+For every pair in the list, the reducer now performs an exact similarity comparison using the Jaccard similarity and only returns if it is >= 0.85. Thanks to the hashing, this has to be done only for 109 docs of the training documents (of 699 total)
